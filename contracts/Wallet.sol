@@ -1,98 +1,96 @@
-
 //SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.7; 
- 
-contract Wallet {
-    address payable walletOwner;
+pragma solidity ^0.8.0;
 
+contract Wallet{
+    //DATA TYPES
+    address payable public walletOwner;
+    //STRUCT
     struct Transaction {
-        uint256 id;
+        uint id;
         string subject;
-        uint256 amount;
+        uint amount;
         address sender;
-        address reciever;
+        address receiver;
     }
-    
-     uint public historyCount;
+
+    //state variable
+
+    uint public historyCount;
+    //ARRAY
+
     Transaction [] public history;
-    constructor() {
+    
+    //CONSTRUCTOR
+    constructor () {
         walletOwner = payable(msg.sender);
         historyCount = 0;
     }
- 
-    // EVENTS
-    event Deposited(uint256 indexed amount, string message, address depositor);
-    event Spending(uint256 indexed amount, string message, address to);
-    //MODIFIERS
+    //MODIFIER
 
-    modifier OwnerPrivillege() {
-        require(msg.sender == walletOwner, "Only wallet owner can call this function");
+    modifier ownerPrivillege( ){
+        require( msg.sender == walletOwner, "Only the owner of this wallet can call this function!!!");
         _;
+    }
+    //EVENTS
+       event Deposited(uint indexed amount, string message, address depositor);
+       event Transfered( uint indexed amount, string message, address receiver);
+    
+    //FUNCTIONS
+    
+    function deposit() public payable{
+        
+        history.push(Transaction (historyCount++, "Deposit", msg.value, msg.sender, address(this) ));
+       
+        //Notification
+        emit Deposited (msg.value, "Deposited by ", msg.sender);
     }
 
     
-    function deposit() public payable {
-        // recording the deposit
-        history.push( Transaction( historyCount++, "Deposit", msg.value, msg.sender, address(this)));
-        //event calling
-        emit Deposited(msg.value, " Deposited by ", msg.sender);
+    function transfer (address payable Individual, uint amount ) public ownerPrivillege {
+        //ensure that wallet balance is > request
+
+        require(address(this).balance > amount, "Insufficent balance!!!");
+
+        // to be excuted if balance is more than enough
+
+      payable(Individual).transfer(amount);
+
+      history.push(Transaction (historyCount++, "Transfer", amount, address(this), Individual ));
+        //Notification
+        emit Transfered (amount, "You just transfered to", Individual);
     }
-
-    // Transfer to my Metamask
-    function withdraw(uint256 amount) public OwnerPrivillege {
-        // Limit withdrawal amount
-        require(amount <= 10 ether);
-        // Ensure Wallet balance is greater than request
-        require(address(this).balance >= amount, "Insufficient balance baby!");
-          // Send the amount to the address that requested it
-        walletOwner.transfer(amount);
-        // recording the transaction
-        history.push( Transaction(historyCount++, "Withdrawal", amount, address(this), walletOwner));
-      
-    }
-
-    // Separate function for running give aways or
-    // Paying  other people for services rendered to me
-    function spend(address payable Individual, uint256 amount) public OwnerPrivillege {
-        // Ensure Wallet balance is greater than request
-        require(address(this).balance >= amount, "Insufficient balance baby!");
-
-        Individual.transfer(amount);
-        //record the transfer
-        history.push( Transaction(historyCount++, "Transfer", amount, address(this), Individual));
-        // event calling
-        emit Spending(amount, " Is what You just sent to ", Individual);
-    }
-
-    // Accept any incoming amount
-    function recieve() public payable {
-        
-        history.push( Transaction( historyCount++, "Recieved", msg.value, msg.sender, address(this)));
-        //event calling
-        emit Deposited(msg.value, " Fallback deposit made by ", msg.sender);
-    }
-
-    function balance () public view returns( uint256 ){
+    //Display my balance
+    function balance ( ) public view returns (uint){
         return address(this).balance;
     }
 
-    function showAddress () public view returns( address ){
-        return address(this);
-    }
+    // Display history of the walllet
 
-    
-    function getHistory() public view returns (Transaction[] memory) {
+    function getHistory ( ) public view returns (Transaction [] memory){
         return history;
     }
-    
-    function getTransaction(uint256 _id) public view returns (Transaction memory) {
+
+    // get single transaction
+
+    function getTransaction (uint _id) public view returns (Transaction memory ){
         return history[_id - 1];
     }
-          
-    function sucide() public OwnerPrivillege {
-        selfdestruct(walletOwner);
-    }
 
+    // fallback function
+
+    receive () external payable {
+          history.push(Transaction (historyCount++, "Deposit", msg.value, msg.sender, address(this) ));
+       
+        //Notification
+        emit Deposited (msg.value, "Deposited by ", msg.sender);
     
+    } 
+
+    //destory contract on my command 
+
+    function destroy ( ) public ownerPrivillege {
+        selfdestruct(walletOwner);
+
+    }
 }
