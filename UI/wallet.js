@@ -32,7 +32,7 @@ const  Wallet =  ( ) =>{
          // event 
          window.ethereum.on('accountsChanged', async () => {
           // Time to reload your interface with accounts[0]!
-          const accounts = await web3.eth.getAccounts()
+          let accounts = await web3.eth.getAccounts()
           setAddress(accounts[0])
 
         });
