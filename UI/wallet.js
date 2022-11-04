@@ -3,12 +3,15 @@ import { useState, useEffect } from 'react'
 import styles from '../styles/wallet.module.css'
 import  'bulma/css/bulma.css'
 import Web3 from 'web3'
+import SmartContract from '../Blockchain/wallet'
 
 const  Wallet =  ( ) =>{
 
     // STATE VARIABLES
-    const [error, setError ] = useState('')
-    const [web3, setWeb3 ] = useState(null)
+    const [ error, setError ] = useState('')
+    const [ web3, setWeb3 ] = useState(null)
+    const [ address, setAddress ] = useState(null)
+    const [ walletContract, setWalletContract ] = useState(null)
 
     const connectWalletHandler = async ( ) =>{
         if( typeof  window !== 'undefined' && typeof window.ethereum !== 'undefined'){
@@ -17,6 +20,22 @@ const  Wallet =  ( ) =>{
           await   window.ethereum.request({ method: 'eth_requestAccounts'})
             web3 = new Web3(window.ethereum)
            setWeb3(web3)
+            
+         // choosing an account
+         const accounts = await web3.eth.getAccounts()
+         setAddress(accounts[0])
+
+         // bringing in the wallet 
+         const  wc = SmartContract ( web3 )
+         setWalletContract(wc)
+
+         // event 
+         window.ethereum.on('accountsChanged', async () => {
+          // Time to reload your interface with accounts[0]!
+          const accounts = await web3.eth.getAccounts()
+          setAddress(accounts[0])
+
+        });
 
            } catch (error) {
             setError(error.message)
