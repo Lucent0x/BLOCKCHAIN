@@ -1,4 +1,4 @@
-import Head from 'next/Head'
+import Head from 'next/head'
 import { useState, useEffect } from 'react'
 import styles from '../styles/wallet.module.css'
 import  'bulma/css/bulma.css'
@@ -116,8 +116,8 @@ const  Wallet =  ( ) =>{
                                                          <li><b> Transaction id: </b>  <i> Transaction Id</i></li>  
                                                           <li><b> Type: </b>  <i> Transaction Type </i></li> 
                                                           <li><b> Amount: </b>  <i> Transaction Amount </i> </li>
-                                                          <li> <a className='has-text-link' href={`https://mumbai.polygonscan.com/address/`} target="_blank"><b> Reciever: </b>  <i> Transaction reciever </i></a></li>
-                                                          <li><a className='has-text-link' href={`https://mumbai.polygonscan.com/address/`} target="_blank"><b> Sender: </b>  <i>  Transaction sender </i> </a></li>
+                                                          <li> <a className='has-text-link' href={`https://goerli.ethereum.io/address/`} target="_blank" rel="noreferrer"><b> Reciever: </b>  <i> Transaction reciever </i></a></li>
+                                                          <li><a className='has-text-link' href={`https://goerli.ethereum.io/address/`} target="_blank" rel="noreferrer"><b> Sender: </b>  <i>  Transaction sender </i> </a></li>
                                                              </ul>
                                                     </div>
                                                 </div>
@@ -129,9 +129,6 @@ const  Wallet =  ( ) =>{
             </section>
             <div className='has-text-danger'>
               <p>  {error} </p>
-            </div>
-            <div className='has-text-success'>
-              <p>  Successful </p>
             </div>
            </section>
         </div>
